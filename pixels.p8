@@ -2,10 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 8
 __lua__
 
-i = 0
-inc = 1
-pixel = {}
-color = true
+drawState = {}
 
 function randomColor()
   return rnd(15) + 1
@@ -17,27 +14,28 @@ end
 
 function _init()
 	cls()
-
-  pixel.color = randomColor
+  drawState.i = 0
+  drawState.grow = true
+  drawState.getColor = randomColor
 end
 
 function _draw()
-  for x=0,i do
-    for y=0,i do
-      pset(rnd(128), rnd(128), pixel.color())
+  for x=0,drawState.i do
+    for y=0,drawState.i do
+      pset(rnd(128), rnd(128), drawState.getColor())
     end
   end
 end
 
 function _update()
-  i += 1
-  if i == 64 then
-    i = 0
-    color = not color
-    if color then
-      pixel.color = randomColor
+  drawState.i += 1
+  if drawState.i == 64 then
+    drawState.i = 0
+    drawState.grow = not drawState.grow
+    if drawState.grow then
+      drawState.getColor = randomColor
     else
-      pixel.color = black
+      drawState.getColor = black
     end
   end
 end
