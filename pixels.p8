@@ -2,7 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 8
 __lua__
 
-drawState = {}
+pixels = {}
 
 function randomColor()
   return rnd(15) + 1
@@ -13,29 +13,54 @@ function black()
 end
 
 function _init()
-	cls()
-  drawState.i = 0
-  drawState.grow = true
-  drawState.getColor = randomColor
+  pixels.i = 0
+  pixels.grow = true
+  pixels.getColor = randomColor
+  pixels.draw = menuDraw
+  pixels.update = menuUpdate
+  cls()
 end
 
 function _draw()
-  for x=0,drawState.i do
-    for y=0,drawState.i do
-      pset(rnd(128), rnd(128), drawState.getColor())
+  pixels.draw()
+end
+
+function _update()
+  pixels.update()
+end
+
+function menuDraw()
+  for i=0,15 do
+    color(i)
+    print("press for pixels.", 20 + i, 45 + i)
+  end
+end
+
+function menuUpdate()
+  -- TODO Is there a better way to get any key?
+  if btnp(0) or btnp(1) or btnp(2) or btnp(3) or btnp(4) or btnp(5) then
+    pixels.update = pulseUpdate
+    pixels.draw = pulseDraw
+  end
+end
+
+function pulseDraw()
+  for x=0,pixels.i do
+    for y=0,pixels.i do
+      pset(rnd(128), rnd(128), pixels.getColor())
     end
   end
 end
 
-function _update()
-  drawState.i += 1
-  if drawState.i == 64 then
-    drawState.i = 0
-    drawState.grow = not drawState.grow
-    if drawState.grow then
-      drawState.getColor = randomColor
+function pulseUpdate()
+  pixels.i += 1
+  if pixels.i == 64 then
+    pixels.i = 0
+    pixels.grow = not pixels.grow
+    if pixels.grow then
+      pixels.getColor = randomColor
     else
-      drawState.getColor = black
+      pixels.getColor = black
     end
   end
 end
